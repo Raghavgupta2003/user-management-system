@@ -1,0 +1,32 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-app-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus
+
+spec:
+  groups:
+  - name: node-app.rules
+    rules:
+
+    # 🚨 APP DOWN ALERT (same as yours, just cleaner)
+    - alert: AppDown
+      expr: kube_deployment_status_replicas_available{deployment="node-app", namespace="default"} < 1
+      for: 30s
+      labels:
+        severity: critical
+      annotations:
+        summary: "Node App is DOWN 🚨"
+        description: "No replicas available for node-app deployment"
+
+    # ⚠️ LOW TRAFFIC ALERT (FIXED ✅)
+    - alert: LowTraffic
+      expr: sum(rate(http_requests_total{job="node-app-service", namespace="default", route!="/metrics"}[1m])) < 0.1
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Low traffic detected ⚠️"
+        description: "Overall app traffic is very low"

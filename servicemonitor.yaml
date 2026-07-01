@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: node-app-monitor
+  labels:
+    release: prometheus   # 🔥 MUST match helm install
+spec:
+  selector:
+    matchLabels:
+      app: node-app
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

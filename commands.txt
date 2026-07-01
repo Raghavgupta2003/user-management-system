@@ -1,0 +1,23 @@
+minikube start
+
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+
+kubectl port-forward svc/prometheus-grafana -n monitoring 3000:80
+
+
+kubectl port-forward svc/prometheus-kube-prometheus-alertmanager -n monitoring 9093:9093
+
+minikube service node-app-service
+
+Query:
+
+http_requests_total
+
+label = job
+value = node-app-service
+
+kubectl rollout restart deployment node-app
+
+
+kubectl scale deployment node-app --replicas=0
+kubectl scale deployment node-app --replicas=1
